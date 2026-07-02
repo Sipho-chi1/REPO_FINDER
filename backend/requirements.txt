@@ -1,2 +1,6 @@
 requests
 python-dotenv
+pandas
+sqlalchemy
+psycopg2-binary
+google-genai

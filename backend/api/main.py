@@ -1,7 +1,12 @@
 # api/main.py
 import os
+import webbrowser
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from run_pipeline import pipeline  
 import pandas as pd
 
 load_dotenv()
@@ -19,7 +24,7 @@ def get_available_languages():
 
 
 def find_matches(language, experience, min_pct=30):
-    query = """  
+    query = """
         WITH repo_totals AS (
             SELECT repo_id, SUM(bytes) AS total_bytes
             FROM repo_languages GROUP BY repo_id
@@ -48,6 +53,11 @@ def main():
     print("\n=== Repo Finder ===")
     print("Find open-source repos matched to what you're learning.\n")
 
+
+    refresh = input("Refresh data first? (slow, y/N): ").strip().lower()
+    if refresh == "y":
+        pipeline()
+
     print("Languages available in the dataset:")
     langs = get_available_languages()
     for _, row in langs.iterrows():
@@ -57,14 +67,17 @@ def main():
 
     experience = ""
     while experience not in ("beginner", "intermediate", "advanced"):
-        experience = input("Your experience level (beginner/intermediate/advanced)? ").strip().lower()
+        experience = input(
+            "Your experience level (beginner/intermediate/advanced)? "
+        ).strip().lower()
         if experience not in ("beginner", "intermediate", "advanced"):
             print("  Please type: beginner, intermediate, or advanced")
 
     results = find_matches(language, experience)
 
     if results.empty:
-        print(f"\nNo {experience} matches found for {language}. Try another language or level.\n")
+        print(f"\nNo {experience} matches found for {language}. "
+              f"Try another language or level.\n")
         return
 
     print(f"\nFound {len(results)} matching repos:\n")
@@ -73,15 +86,20 @@ def main():
         print(f"      {row['html_url']}")
         print()
 
-    choice = input("Enter a number to open that repo's link (or press Enter to quit): ").strip()
+    choice = input(
+        "Enter a number to open that repo in your browser (or press Enter to quit): "
+    ).strip()
     if choice.isdigit():
         idx = int(choice) - 1
         if 0 <= idx < len(results):
             selected = results.iloc[idx]
-            print(f"\nYou selected: {selected['full_name']}")
+            print(f"\nOpening {selected['full_name']} in your browser...")
             print(f"Link: {selected['html_url']}\n")
+            webbrowser.open(selected["html_url"])
         else:
             print("Invalid selection.\n")
+    else:
+        print("Goodbye.\n")
 
 
 if __name__ == "__main__":

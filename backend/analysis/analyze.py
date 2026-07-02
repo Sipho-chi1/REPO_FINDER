@@ -94,14 +94,3 @@ def run_analysis(engine, language, limit=3):
             print(f"  {row['full_name']} #{row['issue_number']}: {result['level']}")
         except Exception as e:
             print(f"  Failed on #{row['issue_number']}: {e}")
-
-import os
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
-import pandas as pd
-
-load_dotenv()
-engine = create_engine(f"postgresql+psycopg2://postgres:{os.getenv('DB_PASSWORD')}@localhost:5432/repo_finder")
-
-print(pd.read_sql("SELECT * FROM repo_languages", engine))
-print("Row count:", pd.read_sql("SELECT COUNT(*) FROM repo_analysis", engine).iloc[0,0])
