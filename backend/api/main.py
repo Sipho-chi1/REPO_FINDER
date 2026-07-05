@@ -63,6 +63,14 @@ def main():
     for _, row in langs.iterrows():
         print(f"  - {row['language']} ({row['repos']} repos)")
 
+    pd.set_option("display.max_rows", None)
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.width", None)
+
+    df = pd.read_sql("SELECT * FROM repo_analysis", engine)
+    print(f"Total rows: {len(df)}\n")
+    print(df)
+
     language = input("\nWhich language are you learning? ").strip()
 
     experience = ""

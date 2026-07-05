@@ -79,11 +79,11 @@ def save_analysis(engine, repo_id, issue_number, level, reasoning):
         })
 
 
-def run_analysis(engine, language, limit=3):
+def run_analysis(engine, language,rows=3):
     issues = get_issues_to_analyze(engine, language)
-    print(f"Found {len(issues)} un-analysed issues; processing first {limit}")
+    print(f"Found {rows} un-analysed issues; processing first")
 
-    for _, row in issues.head(limit).iterrows():
+    for _, row in issues.head(rows).iterrows():
         prompt = analyze_issue(row["title"], "", row["labels"], language)
         try:
             raw = ask_gemini(prompt)
@@ -94,3 +94,4 @@ def run_analysis(engine, language, limit=3):
             print(f"  {row['full_name']} #{row['issue_number']}: {result['level']}")
         except Exception as e:
             print(f"  Failed on #{row['issue_number']}: {e}")
+

@@ -79,3 +79,4 @@ def enrich_and_build_tables(engine, repos, header):
 
     print(f"Loaded {len(language_rows)} language rows, {len(issue_rows)} issue rows")
 
+
